@@ -1,0 +1,30 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: user-service
+
+  cloud:
+    consul:
+      host: consul       # ⚠️必须用 docker-compose 中的服务名
+      port: 8500
+      discovery:
+        register: true
+        service-name: ${spring.application.name}
+
+  zipkin:
+    base-url: http://zipkin:9411
+
+  sleuth:
+    sampler:
+      probability: 1.0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}

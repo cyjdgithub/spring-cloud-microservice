@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  consul:
+    image: hashicorp/consul
+    ports:
+      - "8500:8500"
+    networks:
+      - backend
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - consul
+      - zipkin
+    networks:
+      - backend
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - consul
+      - zipkin
+    networks:
+      - backend
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - consul
+      - zipkin
+    networks:
+      - backend
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - consul
+      - zipkin
+    networks:
+      - backend
+
+networks:
+  backend:
