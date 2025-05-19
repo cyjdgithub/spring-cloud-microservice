@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    include: route
   application:
     name: api-gateway
   zipkin:
@@ -16,20 +18,6 @@ spring:
       discovery:
         register: true
         service-name: api-gateway
-    gateway:
-      routes:
-        - id: order-service
-          uri: lb://order-service
-          predicates:
-            - Path=/orders/**
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/products/**
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/users/**
 
 management:
   endpoints:
